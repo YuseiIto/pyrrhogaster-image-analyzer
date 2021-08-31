@@ -6,12 +6,16 @@ import cv2
 import csv
 import os
 
-COLOR_THRESHOLD=60
-ESC_KEY = 27
-CONTOURS_AREA_MIN_THRESH=20
-USE_BLUR=False
+
+
+# User Configurations
+SOURCE_LIST_CSV='index.csv'
+SOURCE_DIR='./source'
+SOURCE_ENCODING="UTF-8"
+
 DEST_CSV="dest.csv"
-SOURCE_DIR="./source"
+DEST_ENCODING="UTF-8"
+
 
 LABELS={
   'id':'ID',
@@ -22,8 +26,16 @@ LABELS={
   'black_islands': '黒独立数',
 }
 
-SOURCE_ENCODING="UTF-8"
-DEST_ENCODING="UTF-8"
+# Image process Configurations
+COLOR_THRESHOLD=60
+CONTOURS_AREA_MIN_THRESH=20
+USE_BLUR=False
+
+
+# Other preferences
+CONTOURS_COLOR=(0,255,0)
+
+# --------------- CODE  --------------- 
 
 # Image Process
 
@@ -71,9 +83,9 @@ def showImageUntilKey(img):
   cv2.waitKey()
 
 def showContours(contours,base_image):
-  cv2.drawContours(base_image, contours, -1, (0,255,0), 2) #抽出した輪郭を緑色でimg_colorに重ね書き
-  cv2.imshow("Contours",base_image)
-  cv2.waitKey()
+  img=np.copy(base_image)
+  cv2.drawContours(img, contours, -1, CONTOURS_COLOR, 2)
+  showImageUntilKey(img)
 
 
 
@@ -97,7 +109,7 @@ def writeCSV(path,encoding,data): #path: string , data: list[list[...],...]
 
 # Route routine
 
-rows=readCSV('index.csv',SOURCE_ENCODING)
+rows=readCSV(SOURCE_LIST_CSV,SOURCE_ENCODING)
 label_row=[LABELS['id'],LABELS['pixels_sum'],LABELS['red_pixels'],LABELS['black_pixels'],LABELS['red_islands'],LABELS['black_islands']]
 results=[label_row] # [[id, pixels_sum, red_pixels, black_pixels,red_islands,black_islands], ...]
 
@@ -108,6 +120,3 @@ for row in rows[1:]:
 
 
 writeCSV(DEST_CSV,DEST_ENCODING,results)
-
-
-
